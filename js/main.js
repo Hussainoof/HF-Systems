@@ -7,26 +7,38 @@ const navDots = document.querySelectorAll(".nav-dot");
 
 /* Navigation */
 /* Navigation - slower smooth scroll */
-function smoothScrollTo(targetY, duration = 1100) {
+/* Navigation - stable smooth scroll */
+
+let isAutoScrolling = false;
+
+function smoothScrollToSection(target, duration = 850) {
+  if (!target || isAutoScrolling) return;
+
+  isAutoScrolling = true;
+
+  document.documentElement.classList.add("no-snap");
+
   const startY = window.scrollY;
+  const targetY = target.getBoundingClientRect().top + window.scrollY;
   const distance = targetY - startY;
   const startTime = performance.now();
 
-  function easeInOutCubic(t) {
-    return t < 0.5
-      ? 4 * t * t * t
-      : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
   }
 
   function animate(currentTime) {
     const elapsed = currentTime - startTime;
     const progress = Math.min(elapsed / duration, 1);
-    const eased = easeInOutCubic(progress);
+    const eased = easeOutCubic(progress);
 
     window.scrollTo(0, startY + distance * eased);
 
     if (progress < 1) {
       requestAnimationFrame(animate);
+    } else {
+      document.documentElement.classList.remove("no-snap");
+      isAutoScrolling = false;
     }
   }
 
@@ -38,7 +50,7 @@ navDots.forEach(dot => {
     const target = document.getElementById(dot.dataset.section);
 
     if (target) {
-      smoothScrollTo(target.offsetTop, 1150);
+      smoothScrollToSection(target, 850);
     }
   });
 });

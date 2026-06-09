@@ -1533,3 +1533,10 @@ body.rtl .hero-title::after {
     grid-template-columns: 1fr;
   }
 }
+
+
+
+/* Disable snap only during programmatic navigation */
+html.no-snap {
+  scroll-snap-type: none !important;
+}
